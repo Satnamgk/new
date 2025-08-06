@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
+import { parseHTML } from 'linkedom'; // Lightweight DOM parser for Node.js
 
-// src/app/api/search-property/route.js
 export async function GET(request) {
   try {
-    // Get query parameters from the URL
     const { searchParams } = new URL(request.url);
     const input = searchParams.get('input');
-    const searchsort = searchParams.get('searchsort') || 'address'; // default to 'address'
-    console.log('input:',input, 'searchsort:',searchsort)
-    // Validate required parameters
+    const searchsort = searchParams.get('searchsort') || 'address';
+
     if (!input) {
       return NextResponse.json(
         { message: 'Missing required "input" parameter' },
@@ -16,8 +14,6 @@ export async function GET(request) {
       );
     }
 
-    // Make request to PCPAO API
-    // Note: The external API still requires POST, so we'll maintain that
     const response = await fetch('https://www.pcpao.gov/dal/quicksearch/searchProperty', {
       method: 'POST',
       headers: {
@@ -34,12 +30,39 @@ export async function GET(request) {
     }
 
     const responseData = await response.json();
+
+    // Extract first <a> tag links from each array in response.data
+    if (responseData.data && Array.isArray(responseData.data)) {
+      const firstAnchorLinks = [];
+
+      responseData.data.forEach((itemArray) => {
+        if (Array.isArray(itemArray)) {
+          // Find the first HTML string containing an <a> tag
+          const htmlWithAnchor = itemArray.find((htmlString) => 
+            typeof htmlString === 'string' && htmlString.includes('<a')
+          );
+
+          if (htmlWithAnchor) {
+            const { document } = parseHTML(htmlWithAnchor);
+            const firstAnchor = document.querySelector('a');
+
+            if (firstAnchor && firstAnchor.href) {
+              firstAnchorLinks.push(firstAnchor.href);
+              console.log('Found link:', firstAnchor.href); // Log each link
+            }
+          }
+        }
+      });
+
+      console.log('All first <a> tag links:', firstAnchorLinks); // Log all links
+    }
+
+    // Return the original response (unchanged)
     return NextResponse.json(responseData);
 
   } catch (error) {
-    console.error('Property search error:', error);
     return NextResponse.json(
-      { message: 'Error fetching property data', error: error.message },
+      { message: error.message || 'Failed to fetch property data' },
       { status: 500 }
     );
   }

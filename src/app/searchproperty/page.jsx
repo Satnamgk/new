@@ -28,31 +28,6 @@ const SearchProperty = () => {
         }
     };
 
-    useEffect(() => {
-        if (!data?.data) return; // Skip if no data
-
-        // Process each HTML string in the data array
-        data.data.map(item=>
-        item.forEach((htmlString, index) => {
-            if (!htmlString.trim()) return; // Skip empty strings
-
-            // Parse the HTML string using DOMParser (browser-native)
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlString, "text/html");
-
-            // Get all <a> tags and extract their attributes
-            const links = doc.querySelectorAll('a');
-            links.forEach((link, linkIndex) => {
-                console.log(`Link ${index + 1}-${linkIndex + 1}:`);
-                console.log(`  Href: ${link.href}`);
-                console.log(`  Title: ${link.title || 'N/A'}`);
-                console.log(`  Target: ${link.target || 'N/A'}`);
-                console.log(`  Text: ${link.textContent.trim()}`);
-                console.log('---');
-            });
-        }))
-
-    }, [data]);
 
   
 
