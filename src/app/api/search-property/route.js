@@ -32,7 +32,6 @@ export async function GET(request) {
     const responseData = await response.json();
 
     if (responseData.data && Array.isArray(responseData.data)) {
-  const firstAnchorLinks = [];
   
   // 1. Get the first array of HTML strings
   const firstItemArray = responseData.data[0]; // ← No nested `.data` here
@@ -48,14 +47,13 @@ export async function GET(request) {
     const firstAnchor = document.querySelector('a');
     
     if (firstAnchor && firstAnchor.href) {
-      firstAnchorLinks.push(firstAnchor.href);
-      console.log('First link:', firstAnchor.href);
+    
+    return NextResponse.json({message: 'success!', url: firstAnchor.href});
+
     }
   }
 }
 
-    // Return the original response (unchanged)
-    return NextResponse.json(responseData);
 
   } catch (error) {
     return NextResponse.json(
