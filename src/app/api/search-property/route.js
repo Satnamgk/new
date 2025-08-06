@@ -31,31 +31,28 @@ export async function GET(request) {
 
     const responseData = await response.json();
 
-    // Extract first <a> tag links from each array in response.data
     if (responseData.data && Array.isArray(responseData.data)) {
-      const firstAnchorLinks = [];
-
-      responseData.data.forEach((itemArray) => {
-        if (Array.isArray(itemArray)) {
-          // Find the first HTML string containing an <a> tag
-          const htmlWithAnchor = itemArray.find((htmlString) => 
-            typeof htmlString === 'string' && htmlString.includes('<a')
-          );
-
-          if (htmlWithAnchor) {
-            const { document } = parseHTML(htmlWithAnchor);
-            const firstAnchor = document.querySelector('a');
-
-            if (firstAnchor && firstAnchor.href) {
-              firstAnchorLinks.push(firstAnchor.href);
-              console.log('Found link:', firstAnchor.href); // Log each link
-            }
-          }
-        }
-      });
-
-      console.log('All first <a> tag links:', firstAnchorLinks); // Log all links
+  const firstAnchorLinks = [];
+  
+  // 1. Get the first array of HTML strings
+  const firstItemArray = responseData.data[0]; // ← No nested `.data` here
+  
+  // 2. Find the first HTML string containing an `<a>` tag
+  const htmlWithAnchor = firstItemArray.find((htmlString) => 
+    typeof htmlString === 'string' && htmlString.includes('<a')
+  );
+  
+  // 3. Parse the HTML and extract the link
+  if (htmlWithAnchor) {
+    const { document } = parseHTML(htmlWithAnchor);
+    const firstAnchor = document.querySelector('a');
+    
+    if (firstAnchor && firstAnchor.href) {
+      firstAnchorLinks.push(firstAnchor.href);
+      console.log('First link:', firstAnchor.href);
     }
+  }
+}
 
     // Return the original response (unchanged)
     return NextResponse.json(responseData);
