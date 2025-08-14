@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { parseHTML } from 'linkedom'; // Lightweight DOM parser for Node.js
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export async function GET(request) {
   try {
@@ -32,28 +35,29 @@ export async function GET(request) {
     const responseData = await response.json();
 
     if (responseData.data && Array.isArray(responseData.data)) {
-  
-  // 1. Get the first array of HTML strings
-  const firstItemArray = responseData.data[0]; // ← No nested `.data` here
-  
-  // 2. Find the first HTML string containing an `<a>` tag
-  const htmlWithAnchor = firstItemArray.find((htmlString) => 
-    typeof htmlString === 'string' && htmlString.includes('<a')
-  );
-  
-  // 3. Parse the HTML and extract the link
-  if (htmlWithAnchor) {
-    const { document } = parseHTML(htmlWithAnchor);
-    const firstAnchor = document.querySelector('a');
+      const firstItemArray = responseData.data[0];
     
-    if (firstAnchor && firstAnchor.href) {
+      const combinedHtml = firstItemArray.join('');
     
-    return NextResponse.json({message: 'success!', url: firstAnchor.href});
+      const { document } = parseHTML(combinedHtml);
+      const allAnchorTags = document.querySelectorAll('a');
+   
+      const address = allAnchorTags[0].textContent;
+      const url = allAnchorTags[0].href;
+      const parcelId = allAnchorTags[1].textContent;
+      console.log('first url: ', url, 'parcel Id: ', parcelId)
+
+      const response = await prisma.details.create({
+        data: {
+          address,
+          url,
+          parcelId
+        }
+      });
+
+      return NextResponse.json({ message: 'success!', data: response });
 
     }
-  }
-}
-
 
   } catch (error) {
     return NextResponse.json(

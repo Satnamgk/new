@@ -51,7 +51,7 @@ const SearchProperty = () => {
 
     return (
         <div className="h-screen mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">Property Search</h1>
+            <h1 className="text-2xl font-bold mb-6">Fetch property details</h1>
 
             {/* Search Form */}
             <div className="bg-white p-4 rounded-lg shadow-md mb-6 ">
@@ -73,7 +73,7 @@ const SearchProperty = () => {
                         disabled={loading}
                         className="bg-blue-600 ms-2 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-blue-300"
                     >
-                        {loading ? 'Searching...' : 'Search'}
+                       
                     </button>
                 </div>
 
