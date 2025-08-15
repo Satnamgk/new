@@ -51,7 +51,7 @@ const SearchProperty = () => {
 
     return (
         <div className="h-screen mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">Property Search</h1>
+            <h1 className="text-2xl font-bold mb-6">Properties search Search</h1>
 
             {/* Search Form */}
             <div className="bg-white p-4 rounded-lg shadow-md mb-6 ">
